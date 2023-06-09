@@ -2,11 +2,13 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
 
-from Distillation.src.dataset.mnist import MnistDataset
-from Distillation.src.model.teacher_model import TeacherModel
-from Distillation.src.utils.constants import PATHS, MODEL_PARAMS
-from Distillation.src.utils.dataset_operations import average_images
+from src.dataset.mnist import MnistDataset
+from src.model.teacher_model import TeacherModel
+from src.model.student_model import StudentModel
+from src.utils.constants import PATHS, MODEL_PARAMS
+from src.utils.dataset_operations import average_images
 
 # Some parameters to compare the results
 accuracies = list()
@@ -205,7 +207,7 @@ for n_sample in n_samples:
     avg = TeacherModel(T=3.5)  # T is set as Softmax Temperature
 
     optimizer = tf.keras.optimizers.Adam()
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
 
     avg.compile(
         loss=loss,
