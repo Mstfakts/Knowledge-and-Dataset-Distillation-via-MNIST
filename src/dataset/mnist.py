@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.utils import Sequence
 
-from Distillation.src.utils.constants import MODEL_PARAMS
+from src.utils.constants import MODEL_PARAMS
 
 
 class DataGenerator(Sequence):
