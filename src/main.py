@@ -10,6 +10,7 @@ from src.model.student_model import StudentModel
 from src.utils.constants import PATHS, MODEL_PARAMS
 from src.utils.dataset_operations import average_images, select_images
 
+
 # Some parameters to compare the results
 accuracies = list()
 misclassifications = list()
