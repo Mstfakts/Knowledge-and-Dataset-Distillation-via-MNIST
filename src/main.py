@@ -8,7 +8,8 @@ from src.dataset.mnist import MnistDataset
 from src.model.teacher_model import TeacherModel
 from src.model.student_model import StudentModel
 from src.utils.constants import PATHS, MODEL_PARAMS
-from src.utils.dataset_operations import average_images
+from src.utils.dataset_operations import average_images, select_images
+
 
 # Some parameters to compare the results
 accuracies = list()
@@ -229,9 +230,55 @@ for n_sample in n_samples:
     misclassifications.append(misclassification)
 
     if MODEL_PARAMS.IS_SAVE:
-        avg.save(PATHS.AVG_PATH)
+        avg.save(PATHS.AVG_PATH+str(n_sample))
 
     del avg
+
+"""
+Selection Model Section
+"""
+print("\n\n")
+print("###########################")
+print("### Selection ###")
+print("###########################")
+
+# For this section, the averaged MNIST dataset is used.
+
+n_samples = [20, 100, 500, 2500]
+
+for n_sample in n_samples:
+    print("\n")
+    print(f"For n_sample {n_sample};")
+    X_train_selection, y_train_selection = select_images(X_train, y_train, num_samples=n_sample)
+    train_gen_kf = mnist_dataset.convert_generator(X_train_selection, y_train_selection)
+    selection = TeacherModel(T=3.5)  # T is set as Softmax Temperature
+
+    optimizer = tf.keras.optimizers.Adam()
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
+
+    selection.compile(
+        loss=loss,
+        optimizer=optimizer,
+        metrics=["accuracy"])
+
+    selection.fit(train_gen_kf,
+            batch_size=MODEL_PARAMS.BATCH_SIZE,
+            epochs=1,
+            verbose=1)
+
+    y_pred_selection = np.argmax(selection.predict(X_test), axis=1)
+
+    acc = accuracy_score(y_test, y_pred_selection)
+    misclassification = remaining_tests(acc, num_test)
+    print("Accuracy for Avg Model: ", acc)
+    print(f"Number of samples misclassified: {misclassification}")
+    accuracies.append(acc)
+    misclassifications.append(misclassification)
+
+    if MODEL_PARAMS.IS_SAVE:
+        selection.save(PATHS.SELECTION_PATH+str(n_sample))
+
+    del selection
 """
 Result Section
 """
@@ -248,8 +295,12 @@ result_df = pd.DataFrame([accuracies, misclassifications],
                              'Avg Model-1',
                              'Avg Model-100',
                              'Avg Model-500',
-                             'Avg Model-2000'
+                             'Avg Model-2000',
+                              'Selection Model-1',
+                             'Selection Model-100',
+                             'Selection Model-500',
+                             'Selection Model-2000'
                          ],
                          index=['Accuracy      : ',
                                 'Misclassified : '])
-print(result_df)
+print(result_df.to_string())
