@@ -13,6 +13,7 @@ class PATHS:
     SMALL_PATH = SAVED_MODELS_PATH + "/small"
     STUDENT_PATH = SAVED_MODELS_PATH + "/student"
     AVG_PATH = SAVED_MODELS_PATH + "/avg"
+    SELECTION_PATH = SAVED_MODELS_PATH + "/selection"
 
 
 class MODEL_PARAMS:

@@ -1,5 +1,39 @@
 import numpy as np
 
+def select_images(X_train, Y_train, num_samples):
+    """
+        Select given number of images for each class based on the given training data.
+
+        :param X_train: Training images. The shape of each image should be (28, 28).
+        :param Y_train: Training labels corresponding to the images.
+        :param num_samples: Number of samples per class .
+        :return: A tuple containing the images and their corresponding labels.
+                 The images are reshaped to have a shape of (10 * num_samples, 28, 28, 1),
+                 and the labels have a shape of (10 * num_samples,).
+    """
+
+
+    # Reshape the input data
+    X_train = X_train.reshape(-1, 28 * 28)
+
+    # separate classes
+    class_samples = []
+    for i in range(10):
+        class_indices = np.where(Y_train == i)
+        class_samples.append(X_train[class_indices])
+
+    labels = []
+    train = []
+    for i in range(10):
+        train.append(class_samples[i][0:num_samples])
+        for j in range(num_samples):
+            labels.append(i)
+
+    npa = np.asarray(train, dtype=np.float32)
+    train = npa.reshape(10 * num_samples, 28, 28, 1)
+    labels = np.asarray(labels, dtype=np.float32)
+    labels = labels.reshape(10 * num_samples, )
+    return train, labels
 
 def average_images(X_train, Y_train, num_samples):
     """
